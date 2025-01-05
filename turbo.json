@@ -1,6 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": ["CDK_DEFAULT_ACCOUNT", "CDK_DEFAULT_REGION"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
