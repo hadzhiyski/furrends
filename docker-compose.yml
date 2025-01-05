@@ -1,0 +1,46 @@
+services:
+  keycloak:
+    build:
+      context: apps/keycloak
+      dockerfile: Dockerfile
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=postgres
+      - DB_ADDR=keycloak-db
+      - DB_PORT=10001
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak_user
+      - DB_PASSWORD=keycloak_password
+      - KEYCLOAK_ADMIN=admin
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin 
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin 
+    command: start-dev
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    ports:
+      - 10000:8080
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    restart: always
+  keycloak-db:
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=keycloak_user
+      - POSTGRES_PASSWORD=keycloak_password
+      - POSTGRES_DB=keycloak
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+    ports:
+      - 10001:5432
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  keycloak-db-data:
+  keycloak-data:
